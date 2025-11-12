@@ -82,4 +82,27 @@ public class RolDaoImpl implements RolDao {
                      .getResultList();
         } finally { em.close(); }
     }
+    
+    @Override
+    public List<Rol> buscarPorDescripcion(String descripcion) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Rol> q = em.createQuery(
+                "SELECT r FROM Rol r WHERE r.descripcion = :d", Rol.class);
+            q.setParameter("d", descripcion);
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<Rol> buscarPorNombreODescripcion(String texto) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Rol> q = em.createQuery(
+                "SELECT r FROM Rol r WHERE r.nombre LIKE :t OR r.descripcion LIKE :t", Rol.class);
+            q.setParameter("t", "%" + texto + "%");
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
 }

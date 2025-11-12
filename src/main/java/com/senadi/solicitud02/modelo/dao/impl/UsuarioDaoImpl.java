@@ -82,4 +82,61 @@ public class UsuarioDaoImpl implements UsuarioDao {
                      .getResultList();
         } finally { em.close(); }
     }
+    
+    @Override
+    public List<Usuario> buscarPorNombre(String nombre) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Usuario> q = em.createQuery(
+                "SELECT u FROM Usuario u WHERE u.nombre = :n", Usuario.class);
+            q.setParameter("n", nombre);
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<Usuario> buscarPorApellido(String apellido) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Usuario> q = em.createQuery(
+                "SELECT u FROM Usuario u WHERE u.apellido = :a", Usuario.class);
+            q.setParameter("a", apellido);
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<Usuario> buscarPorCargo(String cargo) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Usuario> q = em.createQuery(
+                "SELECT u FROM Usuario u WHERE u.cargo = :c", Usuario.class);
+            q.setParameter("c", cargo);
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<Usuario> buscarPorNombreYApellido(String nombre, String apellido) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Usuario> q = em.createQuery(
+                "SELECT u FROM Usuario u WHERE u.nombre = :n AND u.apellido = :a", Usuario.class);
+            q.setParameter("n", nombre);
+            q.setParameter("a", apellido);
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<Usuario> buscarPorNombreOCorreo(String texto) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Usuario> q = em.createQuery(
+                "SELECT u FROM Usuario u WHERE u.nombre LIKE :t OR u.correo LIKE :t", Usuario.class);
+            q.setParameter("t", "%" + texto + "%");
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
 }

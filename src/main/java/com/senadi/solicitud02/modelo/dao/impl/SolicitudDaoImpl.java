@@ -1,5 +1,6 @@
 package com.senadi.solicitud02.modelo.dao.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -92,4 +93,69 @@ public class SolicitudDaoImpl implements SolicitudDao {
             return q.getResultList();
         } finally { em.close(); }
     }
+    
+    @Override
+    public List<Solicitud> buscarPorUsuarioYEstado(Long idUsuario, String estado) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Solicitud> q = em.createQuery(
+                "SELECT s FROM Solicitud s WHERE s.usuario.id = :u AND s.estado = :e", Solicitud.class);
+            q.setParameter("u", idUsuario);
+            q.setParameter("e", estado);
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<Solicitud> buscarPorRangoFechas(LocalDateTime desde, LocalDateTime hasta) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Solicitud> q = em.createQuery(
+                "SELECT s FROM Solicitud s WHERE s.fechaCreacion BETWEEN :desde AND :hasta ORDER BY s.fechaCreacion", Solicitud.class);
+            q.setParameter("desde", desde);
+            q.setParameter("hasta", hasta);
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<Solicitud> buscarPorUsuarioYFechas(Long idUsuario, LocalDateTime desde, LocalDateTime hasta) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Solicitud> q = em.createQuery(
+                "SELECT s FROM Solicitud s WHERE s.usuario.id = :u AND s.fechaCreacion BETWEEN :desde AND :hasta", Solicitud.class);
+            q.setParameter("u", idUsuario);
+            q.setParameter("desde", desde);
+            q.setParameter("hasta", hasta);
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<Solicitud> buscarPorEstadoYFechas(String estado, LocalDateTime desde, LocalDateTime hasta) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Solicitud> q = em.createQuery(
+                "SELECT s FROM Solicitud s WHERE s.estado = :e AND s.fechaCreacion BETWEEN :desde AND :hasta", Solicitud.class);
+            q.setParameter("e", estado);
+            q.setParameter("desde", desde);
+            q.setParameter("hasta", hasta);
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<Solicitud> buscarPorUsuarioEstadoYFechas(Long idUsuario, String estado, LocalDateTime desde, LocalDateTime hasta) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Solicitud> q = em.createQuery(
+                "SELECT s FROM Solicitud s WHERE s.usuario.id = :u AND s.estado = :e AND s.fechaCreacion BETWEEN :desde AND :hasta", Solicitud.class);
+            q.setParameter("u", idUsuario);
+            q.setParameter("e", estado);
+            q.setParameter("desde", desde);
+            q.setParameter("hasta", hasta);
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.senadi.solicitud02.modelo.dao.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -62,15 +63,15 @@ public class FirmaDaoImpl implements FirmaDao {
         finally { em.close(); }
     }
 
+    // Devuelve todas las firmas de una solicitud (1:N)
     @Override
-    public Firma buscarPorSolicitud(Long idSolicitud) {
+    public List<Firma> buscarPorSolicitud(Long idSolicitud) {
         EntityManager em = JPAUtil.getEntityManager();
         try {
             TypedQuery<Firma> q = em.createQuery(
-                "SELECT f FROM Firma f WHERE f.solicitud.id = :s", Firma.class);
+                "SELECT f FROM Firma f WHERE f.solicitud.id = :s ORDER BY f.fechaFirma", Firma.class);
             q.setParameter("s", idSolicitud);
-            List<Firma> r = q.getResultList();
-            return r.isEmpty() ? null : r.get(0);
+            return q.getResultList();
         } finally { em.close(); }
     }
 
@@ -80,6 +81,71 @@ public class FirmaDaoImpl implements FirmaDao {
         try {
             return em.createQuery("SELECT f FROM Firma f ORDER BY f.id", Firma.class)
                      .getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<Firma> buscarPorDescripcion(String descripcion) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Firma> q = em.createQuery(
+                "SELECT f FROM Firma f WHERE f.descripcion = :d", Firma.class);
+            q.setParameter("d", descripcion);
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<Firma> buscarPorFecha(LocalDateTime desde, LocalDateTime hasta) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Firma> q = em.createQuery(
+                "SELECT f FROM Firma f WHERE f.fechaFirma BETWEEN :desde AND :hasta ORDER BY f.fechaFirma", 
+                Firma.class);
+            q.setParameter("desde", desde);
+            q.setParameter("hasta", hasta);
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<Firma> buscarPorSolicitudYFecha(Long idSolicitud, LocalDateTime desde, LocalDateTime hasta) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Firma> q = em.createQuery(
+                "SELECT f FROM Firma f WHERE f.solicitud.id = :s AND f.fechaFirma BETWEEN :desde AND :hasta ORDER BY f.fechaFirma",
+                Firma.class);
+            q.setParameter("s", idSolicitud);
+            q.setParameter("desde", desde);
+            q.setParameter("hasta", hasta);
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<Firma> buscarPorSolicitudYDescripcion(Long idSolicitud, String descripcion) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Firma> q = em.createQuery(
+                "SELECT f FROM Firma f WHERE f.solicitud.id = :s AND f.descripcion = :d ORDER BY f.fechaFirma",
+                Firma.class);
+            q.setParameter("s", idSolicitud);
+            q.setParameter("d", descripcion);
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<Firma> buscarPorDescripcionYFecha(String descripcion, LocalDateTime desde, LocalDateTime hasta) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Firma> q = em.createQuery(
+                "SELECT f FROM Firma f WHERE f.descripcion = :d AND f.fechaFirma BETWEEN :desde AND :hasta ORDER BY f.fechaFirma",
+                Firma.class);
+            q.setParameter("d", descripcion);
+            q.setParameter("desde", desde);
+            q.setParameter("hasta", hasta);
+            return q.getResultList();
         } finally { em.close(); }
     }
 }

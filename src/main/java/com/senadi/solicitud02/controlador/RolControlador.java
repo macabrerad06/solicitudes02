@@ -12,5 +12,8 @@ public interface RolControlador {
     Rol buscarPorId(Long id);
     Rol buscarPorNombre(String nombre);
     List<Rol> listarTodos();
+    List<Rol> buscarPorDescripcion(String descripcion);
+    List<Rol> buscarPorNombreODescripcion(String texto);
+
 
 }

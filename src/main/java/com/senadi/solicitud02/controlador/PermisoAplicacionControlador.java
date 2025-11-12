@@ -12,4 +12,10 @@ public interface PermisoAplicacionControlador {
     List<PermisoAplicacion> listarTodos();
     List<PermisoAplicacion> buscarPorAplicacion(Long idAplicacion);
     List<PermisoAplicacion> buscarPorNombre(String nombre);
+    List<PermisoAplicacion> buscarPorDescripcion(String descripcion);
+    List<PermisoAplicacion> buscarPorNombreODescripcion(String texto);
+    List<PermisoAplicacion> buscarPorAplicacionYNombre(Long idAplicacion, String nombre);
+    List<PermisoAplicacion> buscarPorAplicacionYDescripcion(Long idAplicacion, String descripcion);
+    List<PermisoAplicacion> buscarPorAplicacionNombreYDescripcion(Long idAplicacion, String nombre, String descripcion);
+
 }

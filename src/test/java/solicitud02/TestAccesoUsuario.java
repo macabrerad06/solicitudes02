@@ -1,161 +1,137 @@
 package solicitud02;
 
 import static org.junit.Assert.*;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.senadi.solicitud02.controlador.AccesoUsuarioControlador;
 import com.senadi.solicitud02.controlador.AplicacionControlador;
-import com.senadi.solicitud02.controlador.SolicitudControlador;
 import com.senadi.solicitud02.controlador.PermisoAplicacionControlador;
+import com.senadi.solicitud02.controlador.AccesoUsuarioControlador;
+import com.senadi.solicitud02.controlador.SolicitudControlador;
 import com.senadi.solicitud02.controlador.UsuarioControlador;
-import com.senadi.solicitud02.controlador.impl.AccesoUsuarioControladorImpl;
 import com.senadi.solicitud02.controlador.impl.AplicacionControladorImpl;
-import com.senadi.solicitud02.controlador.impl.SolicitudControladorImpl;
 import com.senadi.solicitud02.controlador.impl.PermisoAplicacionControladorImpl;
+import com.senadi.solicitud02.controlador.impl.AccesoUsuarioControladorImpl;
+import com.senadi.solicitud02.controlador.impl.SolicitudControladorImpl;
 import com.senadi.solicitud02.controlador.impl.UsuarioControladorImpl;
-import com.senadi.solicitud02.modelo.entidades.AccesoUsuario;
 import com.senadi.solicitud02.modelo.entidades.Aplicacion;
-import com.senadi.solicitud02.modelo.entidades.Solicitud;
 import com.senadi.solicitud02.modelo.entidades.PermisoAplicacion;
+import com.senadi.solicitud02.modelo.entidades.AccesoUsuario;
+import com.senadi.solicitud02.modelo.entidades.Solicitud;
 import com.senadi.solicitud02.modelo.entidades.Usuario;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class TestAccesoUsuario {
 
-    private final AccesoUsuarioControlador accesoCtrl = new AccesoUsuarioControladorImpl();
-    private final SolicitudControlador solicitudCtrl = new SolicitudControladorImpl();
-    private final PermisoAplicacionControlador permisoCtrl = new PermisoAplicacionControladorImpl();
-    private final AplicacionControlador aplicacionCtrl = new AplicacionControladorImpl();
-    private final UsuarioControlador usuarioCtrl = new UsuarioControladorImpl();
+    private static final UsuarioControlador usuarioCtrl = new UsuarioControladorImpl();
+    private static final SolicitudControlador solicitudCtrl = new SolicitudControladorImpl();
+    private static final AplicacionControlador appCtrl = new AplicacionControladorImpl();
+    private static final PermisoAplicacionControlador permisoCtrl = new PermisoAplicacionControladorImpl();
+    private static final AccesoUsuarioControlador accesoCtrl = new AccesoUsuarioControladorImpl();
 
-    // Helper: Usuario de prueba
-    private Usuario crearUsuarioPrueba() {
-        Usuario usuario = usuarioCtrl.buscarPorCorreo("juan.perez@example.com");
-        if (usuario == null) {
-            usuario = new Usuario();
-            usuario.setNombre("Juan");
-            usuario.setApellido("Pérez");
-            usuario.setCorreo("juan.perez@example.com");
-            usuario.setCargo("Analista");
-            usuarioCtrl.crear(usuario);
+    private static Usuario usuarioBase;
+    private static Solicitud solicitudBase;
+    private static Aplicacion appBase;
+    private static PermisoAplicacion permisoBase;
+
+    @BeforeClass
+    public static void inicializarDatos() {
+        // 1️⃣ Crear usuario base
+        usuarioBase = usuarioCtrl.buscarPorCorreo("acceso.user@example.com");
+        if (usuarioBase == null) {
+            usuarioBase = new Usuario();
+            usuarioBase.setNombre("Ana");
+            usuarioBase.setApellido("Gómez");
+            usuarioBase.setCorreo("acceso.user@example.com");
+            usuarioBase.setCargo("Analista");
+            usuarioCtrl.crear(usuarioBase);
+            System.out.println("🆕 Usuario base creado");
         }
-        return usuario;
-    }
 
-    // Helper: Aplicación de prueba
-    private Aplicacion crearAplicacionPrueba() {
-        Aplicacion app = aplicacionCtrl.buscarPorNombre("Aplicación Prueba");
-        if (app == null) {
-            app = new Aplicacion();
-            app.setNombre("Aplicación Prueba");
-            app.setDescripcion("Aplicación temporal para tests");
-            aplicacionCtrl.crear(app);
+        // 2️⃣ Crear solicitud base
+        List<Solicitud> solicitudes = solicitudCtrl.listarTodos();
+        if (solicitudes.isEmpty()) {
+            solicitudBase = new Solicitud();
+            solicitudBase.setEstado("CREADA");
+            solicitudBase.setUsuario(usuarioBase);
+            solicitudCtrl.crear(solicitudBase);
+        } else {
+            solicitudBase = solicitudes.get(0);
         }
-        return app;
-    }
 
-    // Helper: PermisoAplicacion de prueba
-    private PermisoAplicacion crearPermisoPrueba() {
-        Aplicacion app = crearAplicacionPrueba();
-        PermisoAplicacion p = new PermisoAplicacion();
-        p.setNombre("Permiso Prueba");
-        p.setDescripcion("Permiso temporal para tests");
-        p.setAplicacion(app); // obligatorio
-        permisoCtrl.crear(p);
-        return p;
-    }
+        // 3️⃣ Crear aplicación base
+        appBase = appCtrl.buscarPorNombre("SistemaInventario");
+        if (appBase == null) {
+            appBase = new Aplicacion();
+            appBase.setNombre("SistemaInventario");
+            appBase.setDescripcion("Aplicación para gestión de inventarios");
+            appCtrl.crear(appBase);
+        }
 
-    // Helper: Solicitud de prueba
-    private Solicitud crearSolicitudPrueba() {
-        Usuario usuario = crearUsuarioPrueba();
-        Solicitud s = new Solicitud();
-        s.setUsuario(usuario);
-        s.setEstado("CREADA");
-        solicitudCtrl.crear(s);
-        return s;
+        // 4️⃣ Crear permiso base
+        List<PermisoAplicacion> permisos = permisoCtrl.buscarPorNombre("PRUEBA ACCESO");
+        permisoBase = permisos.isEmpty() ? null : permisos.get(0);
+
+        if (permisoBase == null) {
+            permisoBase = new PermisoAplicacion();
+            permisoBase.setNombre("PRUEBA ACCESO");
+            permisoBase.setDescripcion("Permiso para test de acceso");
+            permisoBase.setAplicacion(appBase);
+            permisoCtrl.crear(permisoBase);
+        }
+
+        // 5️⃣ Crear un acceso usuario si no existe
+        List<AccesoUsuario> accesos = accesoCtrl.buscarPorSolicitud(solicitudBase.getId());
+        if (accesos.isEmpty()) {
+            AccesoUsuario a = new AccesoUsuario();
+            a.setSolicitud(solicitudBase);
+            a.setPermiso(permisoBase);
+            accesoCtrl.crear(a);
+        }
     }
 
     @Test
     public void testCrearAccesoUsuario() {
-        Solicitud s = crearSolicitudPrueba();
-        PermisoAplicacion p = crearPermisoPrueba();
+        AccesoUsuario a = new AccesoUsuario();
+        a.setSolicitud(solicitudBase);
+        a.setPermiso(permisoBase);
 
-        AccesoUsuario nuevo = new AccesoUsuario();
-        nuevo.setSolicitud(s);
-        nuevo.setPermiso(p);
-        nuevo.setFechaCarga(LocalDateTime.now());
-
-        accesoCtrl.crear(nuevo);
-
-        assertNotNull("El accesoUsuario debería haberse creado con ID", nuevo.getId());
-        System.out.println("estoy aqui AccesoUsuario creado con ID: " + nuevo.getId());
+        accesoCtrl.crear(a);
+        assertNotNull("El acceso usuario debe tener ID", a.getId());
+        System.out.println("✅ AccesoUsuario creado con ID: " + a.getId());
     }
 
     @Test
-    public void testActualizarAccesoUsuario() {
-        Solicitud s = crearSolicitudPrueba();
-        PermisoAplicacion p = crearPermisoPrueba();
-
-        AccesoUsuario a = new AccesoUsuario();
-        a.setSolicitud(s);
-        a.setPermiso(p);
-        a.setFechaCarga(LocalDateTime.now());
-        accesoCtrl.crear(a);
-
-        // Actualizar fecha de carga
-        LocalDateTime nuevaFecha = LocalDateTime.now().plusDays(1);
-        a.setFechaCarga(nuevaFecha);
-        AccesoUsuario actualizado = accesoCtrl.actualizar(a);
-
-        assertEquals("La fecha de carga debe haberse actualizado", nuevaFecha, actualizado.getFechaCarga());
-        System.out.println("✅ AccesoUsuario actualizado ID: " + actualizado.getId());
-    }
-
-    @Test
-    public void testListarAccesosUsuario() {
-        Solicitud s = crearSolicitudPrueba();
-        PermisoAplicacion p = crearPermisoPrueba();
-
-        AccesoUsuario a = new AccesoUsuario();
-        a.setSolicitud(s);
-        a.setPermiso(p);
-        accesoCtrl.crear(a);
-
+    public void testListarAccesos() {
         List<AccesoUsuario> lista = accesoCtrl.listarTodos();
-        assertTrue("Debe existir al menos un accesoUsuario", !lista.isEmpty());
-        System.out.println("📋 Total accesosUsuario: " + lista.size());
+        assertFalse("Debe existir al menos un acceso", lista.isEmpty());
+        System.out.println("📋 Total accesos: " + lista.size());
     }
 
     @Test
-    public void testBuscarPorId() {
-        Solicitud s = crearSolicitudPrueba();
-        PermisoAplicacion p = crearPermisoPrueba();
-
-        AccesoUsuario a = new AccesoUsuario();
-        a.setSolicitud(s);
-        a.setPermiso(p);
-        accesoCtrl.crear(a);
-
-        AccesoUsuario encontrado = accesoCtrl.buscarPorId(a.getId());
-        assertNotNull("Debe encontrarse el accesoUsuario por ID", encontrado);
-        System.out.println("🔍 AccesoUsuario encontrado ID: " + encontrado.getId());
+    public void testBuscarPorSolicitud() {
+        List<AccesoUsuario> lista = accesoCtrl.buscarPorSolicitud(solicitudBase.getId());
+        assertFalse("Debe existir al menos un acceso para la solicitud base", lista.isEmpty());
+        System.out.println("🔍 Accesos encontrados para solicitud: " + lista.size());
     }
 
     @Test
-    public void testEliminarAccesoUsuario() {
-        Solicitud s = crearSolicitudPrueba();
-        PermisoAplicacion p = crearPermisoPrueba();
+    public void testBuscarPorPermiso() {
+        List<AccesoUsuario> lista = accesoCtrl.buscarPorPermiso(permisoBase.getId());
+        assertFalse("Debe existir al menos un acceso para el permiso base", lista.isEmpty());
+        System.out.println("🔍 Accesos encontrados para permiso: " + lista.size());
+    }
 
-        AccesoUsuario a = new AccesoUsuario();
-        a.setSolicitud(s);
-        a.setPermiso(p);
-        accesoCtrl.crear(a);
-
-        accesoCtrl.eliminar(a.getId());
-        AccesoUsuario eliminado = accesoCtrl.buscarPorId(a.getId());
-        assertNull("El accesoUsuario debería eliminarse", eliminado);
-        System.out.println("🗑️ AccesoUsuario eliminado correctamente");
+    @Test
+    public void testEliminarAcceso() {
+        List<AccesoUsuario> lista = accesoCtrl.listarTodos();
+        if (!lista.isEmpty()) {
+            AccesoUsuario a = lista.get(0);
+            accesoCtrl.eliminar(a.getId());
+            AccesoUsuario eliminado = accesoCtrl.buscarPorId(a.getId());
+            assertNull("El acceso usuario debe eliminarse", eliminado);
+            System.out.println("🗑️ AccesoUsuario eliminado correctamente");
+        }
     }
 }

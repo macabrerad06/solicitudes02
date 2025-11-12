@@ -23,34 +23,47 @@ public class TestUsuarioRol {
 
     @Test
     public void testCrearUsuarioRol() {
-        // 1️⃣ Buscar o crear usuario
-        Usuario usuario = usuarioCtrl.buscarPorCorreo("juan.perez@example.com");
-        if (usuario == null) {
+        // 1️⃣ Asegurar que usuario exista
+        Usuario usuarioTmp = usuarioCtrl.buscarPorCorreo("juan.perez@example.com");
+        final Usuario usuario;
+        if (usuarioTmp == null) {
             usuario = new Usuario();
             usuario.setNombre("Juan");
             usuario.setApellido("Pérez");
             usuario.setCorreo("juan.perez@example.com");
             usuario.setCargo("Analista");
             usuarioCtrl.crear(usuario);
+        } else {
+            usuario = usuarioTmp;
         }
 
-        // 2️⃣ Buscar o crear rol
-        Rol rol = rolCtrl.buscarPorNombre("Administrador");
-        if (rol == null) {
+        // 2️⃣ Asegurar que rol exista
+        Rol rolTmp = rolCtrl.buscarPorNombre("Administrador");
+        final Rol rol;
+        if (rolTmp == null) {
             rol = new Rol();
             rol.setNombre("Administrador");
             rol.setDescripcion("Rol de prueba para asignaciones");
             rolCtrl.crear(rol);
+        } else {
+            rol = rolTmp;
         }
 
-        // 3️⃣ Crear relación usuario-rol
-        UsuarioRol ur = new UsuarioRol();
-        ur.setUsuario(usuario);
-        ur.setRol(rol);
+        // 3️⃣ Verificar si la relación ya existe
+        List<UsuarioRol> existentes = usuarioRolCtrl.buscarPorUsuario(usuario.getId());
+        boolean relacionExiste = existentes.stream()
+            .anyMatch(ur -> ur.getRol().getId().equals(rol.getId()));
 
-        usuarioRolCtrl.crear(ur);
-        assertNotNull("La relación usuario-rol debe tener un ID asignado", ur.getId());
-        System.out.println("✅ UsuarioRol creado: " + usuario.getNombre() + " → " + rol.getNombre());
+        if (!relacionExiste) {
+            UsuarioRol ur = new UsuarioRol();
+            ur.setUsuario(usuario);
+            ur.setRol(rol);
+            usuarioRolCtrl.crear(ur);
+            assertNotNull("La relación usuario-rol debe tener un ID asignado", ur.getId());
+            System.out.println("✅ UsuarioRol creado: " + usuario.getNombre() + " → " + rol.getNombre());
+        } else {
+            System.out.println("⚠️ La relación usuario-rol ya existe, no se crea duplicado.");
+        }
     }
 
     @Test
@@ -59,7 +72,7 @@ public class TestUsuarioRol {
         assertTrue("Debe existir al menos una relación usuario-rol", !lista.isEmpty());
 
         UsuarioRol ur = lista.get(0);
-        Rol rolNuevo = rolCtrl.buscarPorNombre("Administrador");
+        final Rol rolNuevo = rolCtrl.buscarPorNombre("Administrador");
 
         ur.setRol(rolNuevo);
         UsuarioRol actualizado = usuarioRolCtrl.actualizar(ur);
@@ -76,24 +89,73 @@ public class TestUsuarioRol {
     public void testListarUsuarioRol() {
         List<UsuarioRol> lista = usuarioRolCtrl.listarTodos();
 
-        // Si no hay relaciones, crear una por defecto
         if (lista.isEmpty()) {
             System.out.println("⚠️ No existen relaciones, creando una por defecto...");
 
-            Usuario usuario = usuarioCtrl.buscarPorCorreo("juan.perez@example.com");
-            Rol rol = rolCtrl.buscarPorNombre("Administrador");
+            Usuario usuarioTmp = usuarioCtrl.buscarPorCorreo("juan.perez@example.com");
+            final Usuario usuario;
+            if (usuarioTmp == null) {
+                usuario = new Usuario();
+                usuario.setNombre("Juan");
+                usuario.setApellido("Pérez");
+                usuario.setCorreo("juan.perez@example.com");
+                usuario.setCargo("Analista");
+                usuarioCtrl.crear(usuario);
+            } else {
+                usuario = usuarioTmp;
+            }
 
-            if (usuario != null && rol != null) {
+            Rol rolTmp = rolCtrl.buscarPorNombre("Administrador");
+            final Rol rol;
+            if (rolTmp == null) {
+                rol = new Rol();
+                rol.setNombre("Administrador");
+                rol.setDescripcion("Rol de prueba para asignaciones");
+                rolCtrl.crear(rol);
+            } else {
+                rol = rolTmp;
+            }
+
+            List<UsuarioRol> existentes = usuarioRolCtrl.buscarPorUsuario(usuario.getId());
+            boolean relacionExiste = existentes.stream()
+                .anyMatch(ur -> ur.getRol().getId().equals(rol.getId()));
+
+            if (!relacionExiste) {
                 UsuarioRol ur = new UsuarioRol();
                 ur.setUsuario(usuario);
                 ur.setRol(rol);
                 usuarioRolCtrl.crear(ur);
-                lista = usuarioRolCtrl.listarTodos();
+                assertNotNull("La relación usuario-rol debe tener un ID asignado", ur.getId());
             }
+
+            lista = usuarioRolCtrl.listarTodos();
         }
 
         assertTrue("Debe existir al menos una relación usuario-rol después de crear", !lista.isEmpty());
         System.out.println("📋 Total relaciones usuario-rol: " + lista.size());
+    }
+
+    // ----------------- TEST BÚSQUEDA AVANZADA -----------------
+    @Test
+    public void testBusquedaAvanzadaUsuarioRol() {
+        List<UsuarioRol> todos = usuarioRolCtrl.listarTodos();
+        assertTrue("Debe existir al menos una relación usuario-rol para probar búsqueda", !todos.isEmpty());
+
+        final Usuario u = todos.get(0).getUsuario();
+        List<UsuarioRol> porUsuario = usuarioRolCtrl.buscarPorUsuario(u.getId());
+        assertTrue("Debe encontrar al menos 1 relación para el usuario", porUsuario.size() >= 1);
+        System.out.println("🔎 Relaciones encontradas por usuario " + u.getNombre() + ": " + porUsuario.size());
+
+        final Rol r = todos.get(0).getRol();
+        List<UsuarioRol> porRol = usuarioRolCtrl.buscarPorRol(r.getId());
+        assertTrue("Debe encontrar al menos 1 relación para el rol", porRol.size() >= 1);
+        System.out.println("🔎 Relaciones encontradas por rol " + r.getNombre() + ": " + porRol.size());
+
+        List<UsuarioRol> combinada = todos.stream()
+            .filter(ur -> ur.getUsuario().getId().equals(u.getId()) && ur.getRol().getId().equals(r.getId()))
+            .toList();
+        assertTrue("Debe encontrar al menos 1 relación que coincida con usuario y rol", combinada.size() >= 1);
+        System.out.println("🔎 Relaciones encontradas combinadas usuario+rol: " + combinada.size());
     }
 
     /* @Test

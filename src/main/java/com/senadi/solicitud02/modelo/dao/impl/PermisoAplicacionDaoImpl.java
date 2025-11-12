@@ -92,4 +92,64 @@ public class PermisoAplicacionDaoImpl implements PermisoAplicacionDao {
             return q.getResultList();
         } finally { em.close(); }
     }
+    
+    @Override
+    public List<PermisoAplicacion> buscarPorDescripcion(String descripcion) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<PermisoAplicacion> q = em.createQuery(
+                "SELECT p FROM PermisoAplicacion p WHERE p.descripcion = :d", PermisoAplicacion.class);
+            q.setParameter("d", descripcion);
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<PermisoAplicacion> buscarPorNombreODescripcion(String texto) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<PermisoAplicacion> q = em.createQuery(
+                "SELECT p FROM PermisoAplicacion p WHERE p.nombre LIKE :t OR p.descripcion LIKE :t", PermisoAplicacion.class);
+            q.setParameter("t", "%" + texto + "%");
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<PermisoAplicacion> buscarPorAplicacionYNombre(Long idAplicacion, String nombre) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<PermisoAplicacion> q = em.createQuery(
+                "SELECT p FROM PermisoAplicacion p WHERE p.aplicacion.id = :a AND p.nombre = :n", PermisoAplicacion.class);
+            q.setParameter("a", idAplicacion);
+            q.setParameter("n", nombre);
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<PermisoAplicacion> buscarPorAplicacionYDescripcion(Long idAplicacion, String descripcion) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<PermisoAplicacion> q = em.createQuery(
+                "SELECT p FROM PermisoAplicacion p WHERE p.aplicacion.id = :a AND p.descripcion = :d", PermisoAplicacion.class);
+            q.setParameter("a", idAplicacion);
+            q.setParameter("d", descripcion);
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<PermisoAplicacion> buscarPorAplicacionNombreYDescripcion(Long idAplicacion, String nombre, String descripcion) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<PermisoAplicacion> q = em.createQuery(
+                "SELECT p FROM PermisoAplicacion p WHERE p.aplicacion.id = :a AND p.nombre = :n AND p.descripcion = :d", PermisoAplicacion.class);
+            q.setParameter("a", idAplicacion);
+            q.setParameter("n", nombre);
+            q.setParameter("d", descripcion);
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
 }

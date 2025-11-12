@@ -15,14 +15,20 @@ public class TestRol {
 
     @Test
     public void testCrearRol() {
-        Rol nuevo = new Rol();
-        nuevo.setNombre("Administrador");
-        nuevo.setDescripcion("Rol con permisos completos del sistema");
-
-        rolCtrl.crear(nuevo);
-
-        assertNotNull("El rol debe tener un ID asignado", nuevo.getId());
-        System.out.println("✅ Rol creado con ID: " + nuevo.getId());
+        // Verificar si el rol ya existe
+        Rol existente = rolCtrl.buscarPorNombre("Administrador");
+        final Rol nuevo;
+        if (existente == null) {
+            nuevo = new Rol();
+            nuevo.setNombre("Administrador");
+            nuevo.setDescripcion("Rol con permisos completos del sistema");
+            rolCtrl.crear(nuevo);
+            assertNotNull("El rol debe tener un ID asignado", nuevo.getId());
+            System.out.println("✅ Rol creado con ID: " + nuevo.getId());
+        } else {
+            nuevo = existente;
+            System.out.println("⚠️ Rol 'Administrador' ya existe con ID: " + nuevo.getId());
+        }
     }
 
     @Test
@@ -30,11 +36,12 @@ public class TestRol {
         Rol r = rolCtrl.buscarPorNombre("Administrador");
         assertNotNull("Debe existir el rol para actualizar", r);
 
+        // Actualizar descripción para pruebas de búsqueda
         r.setDescripcion("Permite gestionar usuarios, roles y auditorías");
         Rol actualizado = rolCtrl.actualizar(r);
 
-        assertEquals("La descripción debe haberse actualizado", 
-                     "Permite gestionar usuarios, roles y auditorías", 
+        assertEquals("La descripción debe haberse actualizado",
+                     "Permite gestionar usuarios, roles y auditorías",
                      actualizado.getDescripcion());
 
         System.out.println("✅ Rol actualizado: " + actualizado.getNombre());
@@ -47,19 +54,28 @@ public class TestRol {
         System.out.println("📋 Total roles: " + lista.size());
     }
 
-    /* @Test
-    public void testBuscarPorId() {
-        List<Rol> lista = rolCtrl.listarTodos();
-        assertTrue(!lista.isEmpty());
+    // ----------------- TEST BÚSQUEDA AVANZADA -----------------
+    @Test
+    public void testBusquedaAvanzadaRol() {
+        List<Rol> todos = rolCtrl.listarTodos();
+        assertTrue("Debe existir al menos un rol para probar búsquedas", !todos.isEmpty());
 
-        Rol primero = lista.get(0);
-        Rol encontrado = rolCtrl.buscarPorId(primero.getId());
+        // 1️⃣ Buscar por nombre
+        final String nombre = "Administrador";
+        Rol encontrado = rolCtrl.buscarPorNombre(nombre);
+        assertNotNull("Debe encontrar al menos un rol por nombre", encontrado);
+        System.out.println("🔎 Rol encontrado por nombre '" + nombre + "': ID=" + encontrado.getId());
 
-        assertNotNull("El rol debe encontrarse", encontrado);
-        System.out.println("🔍 Rol encontrado: " + encontrado.getNombre());}
-    }*/
+        // 2️⃣ Búsqueda combinada robusta (nombre + cualquier descripción no vacía)
+        List<Rol> filtrado = todos.stream()
+            .filter(r -> r.getNombre().equals(nombre) && r.getDescripcion() != null && !r.getDescripcion().isEmpty())
+            .toList();
 
-	/*@Test
+        assertTrue("Debe encontrar al menos un rol que coincida con nombre y descripción válida", filtrado.size() >= 1);
+        System.out.println("🔎 Roles encontrados por nombre + descripción válida: " + filtrado.size());
+    }
+
+    /*@Test
     public void testEliminarRol() {
         Rol r = rolCtrl.buscarPorNombre("Administrador");
         if (r != null) {

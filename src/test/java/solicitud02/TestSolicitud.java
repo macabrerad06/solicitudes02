@@ -23,8 +23,8 @@ public class TestSolicitud {
     @BeforeClass
     public static void inicializarDatos() {
         // Crear usuario base si no existe
-        usuarioBase = usuarioCtrl.buscarPorCorreo("solicitud.user@example.com");
-        if (usuarioBase == null) {
+        Usuario usuarioTmp = usuarioCtrl.buscarPorCorreo("solicitud.user@example.com");
+        if (usuarioTmp == null) {
             usuarioBase = new Usuario();
             usuarioBase.setNombre("Carlos");
             usuarioBase.setApellido("Suárez");
@@ -33,6 +33,7 @@ public class TestSolicitud {
             usuarioCtrl.crear(usuarioBase);
             System.out.println("🆕 Usuario base creado para solicitudes");
         } else {
+            usuarioBase = usuarioTmp;
             System.out.println("ℹ️ Usuario base encontrado: " + usuarioBase.getNombre());
         }
 
@@ -65,7 +66,6 @@ public class TestSolicitud {
     public void testActualizarSolicitud() {
         List<Solicitud> solicitudes = solCtrl.listarTodos();
         if (solicitudes.isEmpty()) {
-            // Si no hay, crear una antes de continuar
             Solicitud nueva = new Solicitud();
             nueva.setEstado("CREADA");
             nueva.setUsuario(usuarioBase);
@@ -132,5 +132,31 @@ public class TestSolicitud {
 
         assertNull("La solicitud debería eliminarse correctamente", eliminada);
         System.out.println("🗑️ Solicitud eliminada correctamente");
+    }
+
+    // ----------------- TEST BÚSQUEDA AVANZADA -----------------
+    @Test
+    public void testBusquedaAvanzadaSolicitud() {
+        List<Solicitud> todas = solCtrl.listarTodos();
+        assertTrue("Debe existir al menos una solicitud para probar búsquedas", !todas.isEmpty());
+
+        // 1️⃣ Buscar por usuario
+        final Usuario u = todas.get(0).getUsuario();
+        List<Solicitud> porUsuario = solCtrl.buscarPorUsuario(u.getId());
+        assertTrue("Debe encontrar al menos 1 solicitud para el usuario", porUsuario.size() >= 1);
+        System.out.println("🔎 Solicitudes encontradas por usuario " + u.getNombre() + ": " + porUsuario.size());
+
+        // 2️⃣ Buscar por estado
+        final String estado = todas.get(0).getEstado();
+        List<Solicitud> porEstado = solCtrl.buscarPorEstado(estado);
+        assertTrue("Debe encontrar al menos 1 solicitud con estado " + estado, porEstado.size() >= 1);
+        System.out.println("🔎 Solicitudes encontradas por estado '" + estado + "': " + porEstado.size());
+
+        // 3️⃣ Búsqueda combinada (usuario + estado)
+        List<Solicitud> combinada = todas.stream()
+            .filter(s -> s.getUsuario().getId().equals(u.getId()) && s.getEstado().equals(estado))
+            .toList();
+        assertTrue("Debe encontrar al menos 1 solicitud que coincida con usuario y estado", combinada.size() >= 1);
+        System.out.println("🔎 Solicitudes encontradas combinadas usuario+estado: " + combinada.size());
     }
 }

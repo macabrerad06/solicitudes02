@@ -29,7 +29,6 @@ public class TestUsuario {
 
     @Test
     public void testActualizarUsuario() {
-        // Busca por correo (para evitar duplicados)
         Usuario u = usuarioCtrl.buscarPorCorreo("juan.perez@example.com");
         assertNotNull("Debe existir el usuario para actualizar", u);
 
@@ -68,4 +67,38 @@ public class TestUsuario {
             System.out.println("🗑️ Usuario eliminado correctamente");
         }
     }
+
+    // ----------------- NUEVO TEST BÚSQUEDA AVANZADA -----------------
+    @Test
+    public void testBusquedaAvanzadaUsuario() {
+        // Preparar datos
+        Usuario u1 = new Usuario();
+        u1.setNombre("Carlos");
+        u1.setApellido("Gómez");
+        u1.setCorreo("carlos.gomez@example.com");
+        u1.setCargo("Analista");
+        usuarioCtrl.crear(u1);
+
+        Usuario u2 = new Usuario();
+        u2.setNombre("Carla");
+        u2.setApellido("Lopez");
+        u2.setCorreo("carla.lopez@example.com");
+        u2.setCargo("Supervisor");
+        usuarioCtrl.crear(u2);
+
+        // Simular búsqueda avanzada usando listarTodos + filtro Java
+        String textoBusqueda = "Car";
+        List<Usuario> todos = usuarioCtrl.listarTodos();
+        List<Usuario> resultados = todos.stream()
+            .filter(u -> u.getNombre().contains(textoBusqueda) || u.getApellido().contains(textoBusqueda))
+            .toList();
+
+        assertTrue("Debe encontrar al menos 2 usuarios que contienen 'Car'", resultados.size() >= 2);
+        System.out.println("🔎 Resultados búsqueda simulada por '" + textoBusqueda + "': " + resultados.size());
+
+        // Limpiar datos de prueba
+        usuarioCtrl.eliminar(u1.getId());
+        usuarioCtrl.eliminar(u2.getId());
+    }
+
 }

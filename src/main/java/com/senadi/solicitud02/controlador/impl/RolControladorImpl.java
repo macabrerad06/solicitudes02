@@ -17,4 +17,14 @@ public class RolControladorImpl implements RolControlador {
     @Override public Rol buscarPorId(Long id) { return rolDao.buscarPorId(id); }
     @Override public Rol buscarPorNombre(String nombre) { return rolDao.buscarPorNombre(nombre); }
     @Override public List<Rol> listarTodos() { return rolDao.listarTodos(); }
+    @Override
+    public List<Rol> buscarPorDescripcion(String descripcion) {
+        return rolDao.buscarPorDescripcion(descripcion);
+    }
+
+    @Override
+    public List<Rol> buscarPorNombreODescripcion(String texto) {
+        return rolDao.buscarPorNombreODescripcion(texto);
+    }
+
 }

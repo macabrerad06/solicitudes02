@@ -17,4 +17,29 @@ public class UsuarioControladorImpl implements UsuarioControlador {
     @Override public Usuario buscarPorId(Long id) { return usuarioDao.buscarPorId(id); }
     @Override public Usuario buscarPorCorreo(String correo) { return usuarioDao.buscarPorCorreo(correo); }
     @Override public List<Usuario> listarTodos() { return usuarioDao.listarTodos(); }
+    @Override
+    public List<Usuario> buscarPorNombre(String nombre) {
+        return usuarioDao.buscarPorNombre(nombre);
+    }
+
+    @Override
+    public List<Usuario> buscarPorApellido(String apellido) {
+        return usuarioDao.buscarPorApellido(apellido);
+    }
+
+    @Override
+    public List<Usuario> buscarPorCargo(String cargo) {
+        return usuarioDao.buscarPorCargo(cargo);
+    }
+
+    @Override
+    public List<Usuario> buscarPorNombreYApellido(String nombre, String apellido) {
+        return usuarioDao.buscarPorNombreYApellido(nombre, apellido);
+    }
+
+    @Override
+    public List<Usuario> buscarPorNombreOCorreo(String texto) {
+        return usuarioDao.buscarPorNombreOCorreo(texto);
+    }
+
 }

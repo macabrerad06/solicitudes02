@@ -37,15 +37,25 @@ public class TestPermisoAplicacion {
 
     @Test
     public void testCrearPermiso() {
-        PermisoAplicacion nuevo = new PermisoAplicacion();
-        nuevo.setNombre("CREAR_PRODUCTO");
-        nuevo.setDescripcion("Permite registrar productos en el inventario");
-        nuevo.setAplicacion(appBase);
+        // Verificar si ya existe para no duplicar
+        PermisoAplicacion existente = permisoCtrl.buscarPorNombre("CREAR_PRODUCTO").stream()
+                .filter(p -> p.getAplicacion().getId().equals(appBase.getId()))
+                .findFirst()
+                .orElse(null);
 
-        permisoCtrl.crear(nuevo);
-
-        assertNotNull("El permiso debe tener un ID asignado", nuevo.getId());
-        System.out.println("✅ Permiso creado con ID: " + nuevo.getId());
+        final PermisoAplicacion nuevo;
+        if (existente == null) {
+            nuevo = new PermisoAplicacion();
+            nuevo.setNombre("CREAR_PRODUCTO");
+            nuevo.setDescripcion("Permite registrar productos en el inventario");
+            nuevo.setAplicacion(appBase);
+            permisoCtrl.crear(nuevo);
+            assertNotNull("El permiso debe tener un ID asignado", nuevo.getId());
+            System.out.println("✅ Permiso creado con ID: " + nuevo.getId());
+        } else {
+            nuevo = existente;
+            System.out.println("⚠️ Permiso 'CREAR_PRODUCTO' ya existe con ID: " + nuevo.getId());
+        }
     }
 
     @Test
@@ -70,13 +80,31 @@ public class TestPermisoAplicacion {
         System.out.println("📋 Total de permisos: " + lista.size());
     }
 
+    // ----------------- TEST BÚSQUEDA AVANZADA -----------------
     @Test
-    public void testBuscarPorAplicacion() {
-        assertNotNull("Debe existir la aplicación base", appBase);
+    public void testBusquedaAvanzadaPermiso() {
+        List<PermisoAplicacion> todos = permisoCtrl.listarTodos();
+        assertTrue("Debe existir al menos un permiso para probar búsquedas", !todos.isEmpty());
 
-        List<PermisoAplicacion> permisos = permisoCtrl.buscarPorAplicacion(appBase.getId());
-        assertNotNull(permisos);
-        System.out.println("🔍 Permisos encontrados para " + appBase.getNombre() + ": " + permisos.size());
+        // 1️⃣ Buscar por aplicación
+        final Long idApp = appBase.getId();
+        List<PermisoAplicacion> porAplicacion = permisoCtrl.buscarPorAplicacion(idApp);
+        assertTrue("Debe encontrar al menos un permiso para la aplicación", porAplicacion.size() >= 1);
+        System.out.println("🔎 Permisos encontrados para la aplicación " + appBase.getNombre() + ": " + porAplicacion.size());
+
+        // 2️⃣ Buscar por nombre
+        final String nombre = "CREAR_PRODUCTO";
+        List<PermisoAplicacion> porNombre = permisoCtrl.buscarPorNombre(nombre);
+        assertTrue("Debe encontrar al menos un permiso con el nombre especificado", porNombre.size() >= 1);
+        System.out.println("🔎 Permisos encontrados por nombre '" + nombre + "': " + porNombre.size());
+
+        // 3️⃣ Búsqueda combinada (aplicación + nombre)
+        List<PermisoAplicacion> combinada = todos.stream()
+            .filter(p -> p.getAplicacion().getId().equals(idApp) && p.getNombre().equals(nombre))
+            .toList();
+
+        assertTrue("Debe encontrar al menos un permiso que coincida con aplicación y nombre", combinada.size() >= 1);
+        System.out.println("🔎 Permisos encontrados combinados aplicación+nombre: " + combinada.size());
     }
 
     @Test

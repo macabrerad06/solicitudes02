@@ -23,9 +23,10 @@ public class Solicitud {
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
-    // Solicitud -> Firma (1:1)
-    @OneToOne(mappedBy = "solicitud", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Firma firma;
+    // Solicitud -> Firma (1:N)
+    @OneToMany(mappedBy = "solicitud", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Firma> firmas = new ArrayList<>();
+
 
     // Solicitud -> AccesoUsuario (1:N)
     @OneToMany(mappedBy = "solicitud", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -63,13 +64,14 @@ public class Solicitud {
 		this.usuario = usuario;
 	}
 
-	public Firma getFirma() {
-		return firma;
+	public List<Firma> getFirmas() {
+	    return firmas;
 	}
 
-	public void setFirma(Firma firma) {
-		this.firma = firma;
+	public void setFirmas(List<Firma> firmas) {
+	    this.firmas = firmas;
 	}
+
 
 	public List<AccesoUsuario> getAccesos() {
 		return accesos;
@@ -82,7 +84,7 @@ public class Solicitud {
 	@Override
 	public String toString() {
 		return "Solicitud [id=" + id + ", fechaCreacion=" + fechaCreacion + ", estado=" + estado + ", usuario="
-				+ usuario + ", firma=" + firma + ", accesos=" + accesos + "]";
+				+ usuario + ", firmas=" + firmas + ", accesos=" + accesos + "]";
 	}
 
     

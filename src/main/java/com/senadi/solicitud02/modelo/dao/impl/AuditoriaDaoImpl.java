@@ -1,5 +1,6 @@
 package com.senadi.solicitud02.modelo.dao.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -92,4 +93,69 @@ public class AuditoriaDaoImpl implements AuditoriaDao {
             return q.getResultList();
         } finally { em.close(); }
     }
+    
+    @Override
+    public List<Auditoria> buscarPorRangoFechas(LocalDateTime desde, LocalDateTime hasta) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Auditoria> q = em.createQuery(
+                "SELECT a FROM Auditoria a WHERE a.fechaEvento BETWEEN :desde AND :hasta ORDER BY a.fechaEvento", Auditoria.class);
+            q.setParameter("desde", java.sql.Timestamp.valueOf(desde));
+            q.setParameter("hasta", java.sql.Timestamp.valueOf(hasta));
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<Auditoria> buscarPorUsuarioYAccion(Long idUsuario, String accion) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Auditoria> q = em.createQuery(
+                "SELECT a FROM Auditoria a WHERE a.usuario.id = :u AND a.accion = :ac", Auditoria.class);
+            q.setParameter("u", idUsuario);
+            q.setParameter("ac", accion);
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<Auditoria> buscarPorUsuarioYFechas(Long idUsuario, LocalDateTime desde, LocalDateTime hasta) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Auditoria> q = em.createQuery(
+                "SELECT a FROM Auditoria a WHERE a.usuario.id = :u AND a.fechaEvento BETWEEN :desde AND :hasta", Auditoria.class);
+            q.setParameter("u", idUsuario);
+            q.setParameter("desde", java.sql.Timestamp.valueOf(desde));
+            q.setParameter("hasta", java.sql.Timestamp.valueOf(hasta));
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<Auditoria> buscarPorAccionYFechas(String accion, LocalDateTime desde, LocalDateTime hasta) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Auditoria> q = em.createQuery(
+                "SELECT a FROM Auditoria a WHERE a.accion = :ac AND a.fechaEvento BETWEEN :desde AND :hasta", Auditoria.class);
+            q.setParameter("ac", accion);
+            q.setParameter("desde", java.sql.Timestamp.valueOf(desde));
+            q.setParameter("hasta", java.sql.Timestamp.valueOf(hasta));
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<Auditoria> buscarPorUsuarioAccionYFechas(Long idUsuario, String accion, LocalDateTime desde, LocalDateTime hasta) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Auditoria> q = em.createQuery(
+                "SELECT a FROM Auditoria a WHERE a.usuario.id = :u AND a.accion = :ac AND a.fechaEvento BETWEEN :desde AND :hasta", Auditoria.class);
+            q.setParameter("u", idUsuario);
+            q.setParameter("ac", accion);
+            q.setParameter("desde", java.sql.Timestamp.valueOf(desde));
+            q.setParameter("hasta", java.sql.Timestamp.valueOf(hasta));
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
 }

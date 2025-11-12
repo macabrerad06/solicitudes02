@@ -1,5 +1,6 @@
 package com.senadi.solicitud02.controlador.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import com.senadi.solicitud02.controlador.AuditoriaControlador;
 import com.senadi.solicitud02.modelo.dao.AuditoriaDao;
@@ -17,4 +18,29 @@ public class AuditoriaControladorImpl implements AuditoriaControlador {
     @Override public List<Auditoria> listarTodos() { return auditoriaDao.listarTodos(); }
     @Override public List<Auditoria> buscarPorUsuario(Long idUsuario) { return auditoriaDao.buscarPorUsuario(idUsuario); }
     @Override public List<Auditoria> buscarPorAccion(String accion) { return auditoriaDao.buscarPorAccion(accion); }
+    @Override
+    public List<Auditoria> buscarPorRangoFechas(LocalDateTime desde, LocalDateTime hasta) {
+        return auditoriaDao.buscarPorRangoFechas(desde, hasta);
+    }
+
+    @Override
+    public List<Auditoria> buscarPorUsuarioYAccion(Long idUsuario, String accion) {
+        return auditoriaDao.buscarPorUsuarioYAccion(idUsuario, accion);
+    }
+
+    @Override
+    public List<Auditoria> buscarPorUsuarioYFechas(Long idUsuario, LocalDateTime desde, LocalDateTime hasta) {
+        return auditoriaDao.buscarPorUsuarioYFechas(idUsuario, desde, hasta);
+    }
+
+    @Override
+    public List<Auditoria> buscarPorAccionYFechas(String accion, LocalDateTime desde, LocalDateTime hasta) {
+        return auditoriaDao.buscarPorAccionYFechas(accion, desde, hasta);
+    }
+
+    @Override
+    public List<Auditoria> buscarPorUsuarioAccionYFechas(Long idUsuario, String accion, LocalDateTime desde, LocalDateTime hasta) {
+        return auditoriaDao.buscarPorUsuarioAccionYFechas(idUsuario, accion, desde, hasta);
+    }
+
 }

@@ -6,6 +6,6 @@
   <installed facet="java" version="21"/>
   <installed facet="jst.jsf" version="2.3"/>
   <installed facet="wst.jsdt.web" version="1.0"/>
-  <installed facet="jst.web" version="5.0"/>
   <installed facet="jpt.jpa" version="3.0"/>
+  <installed facet="jst.web" version="3.1"/>
 </faceted-project>

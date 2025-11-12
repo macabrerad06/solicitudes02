@@ -1,5 +1,6 @@
 package com.senadi.solicitud02.modelo.dao.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -82,4 +83,79 @@ public class AplicacionDaoImpl implements AplicacionDao {
                      .getResultList();
         } finally { em.close(); }
     }
+    
+    @Override
+    public List<Aplicacion> buscarPorDescripcion(String descripcion) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Aplicacion> q = em.createQuery(
+                "SELECT a FROM Aplicacion a WHERE a.descripcion = :d", Aplicacion.class);
+            q.setParameter("d", descripcion);
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<Aplicacion> buscarPorNombreODescripcion(String texto) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Aplicacion> q = em.createQuery(
+                "SELECT a FROM Aplicacion a WHERE a.nombre LIKE :t OR a.descripcion LIKE :t", Aplicacion.class);
+            q.setParameter("t", "%" + texto + "%");
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<Aplicacion> buscarPorRangoFechas(LocalDateTime desde, LocalDateTime hasta) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Aplicacion> q = em.createQuery(
+                "SELECT a FROM Aplicacion a WHERE a.fechaCreacion BETWEEN :desde AND :hasta ORDER BY a.fechaCreacion", Aplicacion.class);
+            q.setParameter("desde", java.sql.Timestamp.valueOf(desde));
+            q.setParameter("hasta", java.sql.Timestamp.valueOf(hasta));
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<Aplicacion> buscarPorNombreYFechas(String nombre, LocalDateTime desde, LocalDateTime hasta) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Aplicacion> q = em.createQuery(
+                "SELECT a FROM Aplicacion a WHERE a.nombre = :n AND a.fechaCreacion BETWEEN :desde AND :hasta", Aplicacion.class);
+            q.setParameter("n", nombre);
+            q.setParameter("desde", java.sql.Timestamp.valueOf(desde));
+            q.setParameter("hasta", java.sql.Timestamp.valueOf(hasta));
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<Aplicacion> buscarPorDescripcionYFechas(String descripcion, LocalDateTime desde, LocalDateTime hasta) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Aplicacion> q = em.createQuery(
+                "SELECT a FROM Aplicacion a WHERE a.descripcion = :d AND a.fechaCreacion BETWEEN :desde AND :hasta", Aplicacion.class);
+            q.setParameter("d", descripcion);
+            q.setParameter("desde", java.sql.Timestamp.valueOf(desde));
+            q.setParameter("hasta", java.sql.Timestamp.valueOf(hasta));
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<Aplicacion> buscarPorNombreDescripcionYFechas(String nombre, String descripcion, LocalDateTime desde, LocalDateTime hasta) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Aplicacion> q = em.createQuery(
+                "SELECT a FROM Aplicacion a WHERE a.nombre = :n AND a.descripcion = :d AND a.fechaCreacion BETWEEN :desde AND :hasta", Aplicacion.class);
+            q.setParameter("n", nombre);
+            q.setParameter("d", descripcion);
+            q.setParameter("desde", java.sql.Timestamp.valueOf(desde));
+            q.setParameter("hasta", java.sql.Timestamp.valueOf(hasta));
+            return q.getResultList();
+        } finally { em.close(); }
+    }
+
 }

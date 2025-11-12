@@ -16,10 +16,11 @@ public class Firma {
     @Column(name = "fecha_firma", nullable = false)
     private LocalDateTime fechaFirma = LocalDateTime.now();
 
-    // (1:1) con Solicitud
-    @OneToOne(optional = false)
-    @JoinColumn(name = "id_solicitud", nullable = false, unique = true)
+    // (N:1) con Solicitud
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_solicitud", nullable = false)
     private Solicitud solicitud;
+
 
 	public Long getId() {
 		return id;

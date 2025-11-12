@@ -1,6 +1,7 @@
 package solicitud02;
 
 import static org.junit.Assert.*;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.senadi.solicitud02.controlador.AplicacionControlador;
@@ -11,13 +12,28 @@ import java.util.List;
 
 public class TestAplicacion {
 
-    private final AplicacionControlador appCtrl = new AplicacionControladorImpl();
+    private static final AplicacionControlador appCtrl = new AplicacionControladorImpl();
+    private static Aplicacion appBase;
+
+    @BeforeClass
+    public static void inicializarDatos() {
+        appBase = appCtrl.buscarPorNombre("SistemaInventario");
+        if (appBase == null) {
+            appBase = new Aplicacion();
+            appBase.setNombre("SistemaInventario");
+            appBase.setDescripcion("Aplicación para gestión de inventarios");
+            appCtrl.crear(appBase);
+            System.out.println("🆕 Aplicación base creada: " + appBase.getNombre());
+        } else {
+            System.out.println("ℹ️ Aplicación base encontrada: " + appBase.getNombre());
+        }
+    }
 
     @Test
     public void testCrearAplicacion() {
         Aplicacion nueva = new Aplicacion();
-        nueva.setNombre("SistemaInventario");
-        nueva.setDescripcion("Aplicación para gestión de inventarios");
+        nueva.setNombre("SistemaRRHH");
+        nueva.setDescripcion("Aplicación para gestión de recursos humanos");
 
         appCtrl.crear(nueva);
 
@@ -47,26 +63,25 @@ public class TestAplicacion {
         System.out.println("📋 Total de aplicaciones: " + lista.size());
     }
 
-    /* @Test
-    public void testBuscarPorId() {
-        List<Aplicacion> lista = appCtrl.listarTodos();
-        assertTrue(!lista.isEmpty());
+    @Test
+    public void testBuscarPorNombre() {
+        // Buscar la aplicación base
+        Aplicacion encontrada = appCtrl.buscarPorNombre("SistemaInventario");
+        assertNotNull("Debe encontrarse la aplicación por nombre", encontrada);
+        System.out.println("🔍 Aplicación encontrada por nombre: " + encontrada.getNombre());
+    }
 
-        Aplicacion primera = lista.get(0);
-        Aplicacion encontrada = appCtrl.buscarPorId(primera.getId());
-
-        assertNotNull("La aplicación debe encontrarse", encontrada);
-        System.out.println("🔍 Aplicación encontrada: " + encontrada.getNombre());
-    } */
-
-    /* @Test
+    @Test
     public void testEliminarAplicacion() {
-        Aplicacion a = appCtrl.buscarPorNombre("SistemaInventario");
-        if (a != null) {
-            appCtrl.eliminar(a.getId());
-            Aplicacion eliminada = appCtrl.buscarPorId(a.getId());
-            assertNull("La aplicación debe eliminarse correctamente", eliminada);
-            System.out.println("🗑️ Aplicación eliminada correctamente");
-        }
-    } */
+        // Crear temporal para eliminar
+        Aplicacion temp = new Aplicacion();
+        temp.setNombre("TempApp");
+        temp.setDescripcion("Aplicación temporal para eliminar");
+        appCtrl.crear(temp);
+
+        appCtrl.eliminar(temp.getId());
+        Aplicacion eliminado = appCtrl.buscarPorNombre("TempApp");
+        assertNull("La aplicación temporal debe eliminarse correctamente", eliminado);
+        System.out.println("🗑️ Aplicación eliminada correctamente");
+    }
 }

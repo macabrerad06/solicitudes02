@@ -14,6 +14,7 @@ import com.senadi.solicitud02.modelo.entidades.Firma;
 import com.senadi.solicitud02.modelo.entidades.Solicitud;
 import com.senadi.solicitud02.modelo.entidades.Usuario;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class TestFirma {
@@ -27,7 +28,7 @@ public class TestFirma {
 
     @BeforeClass
     public static void inicializarDatos() {
-        // Crear usuario base si no existe
+        // Crear usuario base
         usuarioBase = usuarioCtrl.buscarPorCorreo("firma.user@example.com");
         if (usuarioBase == null) {
             usuarioBase = new Usuario();
@@ -36,117 +37,109 @@ public class TestFirma {
             usuarioBase.setCorreo("firma.user@example.com");
             usuarioBase.setCargo("Supervisor");
             usuarioCtrl.crear(usuarioBase);
-            System.out.println("🆕 Usuario base creado para firmas");
-        } else {
-            System.out.println("ℹ️ Usuario base encontrado: " + usuarioBase.getCorreo());
         }
 
-        // Crear o asegurar solicitud base: siempre crear si no hay ninguna
+        // Crear solicitud base
         List<Solicitud> solicitudes = solicitudCtrl.listarTodos();
         if (solicitudes.isEmpty()) {
             solicitudBase = new Solicitud();
             solicitudBase.setEstado("CREADA");
             solicitudBase.setUsuario(usuarioBase);
             solicitudCtrl.crear(solicitudBase);
-            System.out.println("🆕 Solicitud base creada para firma (ID: " + solicitudBase.getId() + ")");
         } else {
-            // usar la primera solicitud existente
             solicitudBase = solicitudes.get(0);
-            System.out.println("ℹ️ Solicitud base reutilizada ID: " + solicitudBase.getId());
         }
-
-        // recargar solicitudBase para obtenerla gestionada y con datos actualizados
-        solicitudBase = solicitudCtrl.buscarPorId(solicitudBase.getId());
     }
 
     @Test
     public void testCrearFirma() {
-        try {
-            // recargar solicitud para asegurarnos que esté gestionada
-            solicitudBase = solicitudCtrl.buscarPorId(solicitudBase.getId());
+        Firma f = new Firma();
+        f.setDescripcion("Firma prueba " + LocalDateTime.now());
+        f.setSolicitud(solicitudBase);
 
-            // verificar si ya existe una firma para esta solicitud y eliminarla si existe
-            List<Firma> todas = firmaCtrl.listarTodos();
-            for (Firma f : todas) {
-                if (f.getSolicitud() != null && f.getSolicitud().getId().equals(solicitudBase.getId())) {
-                    System.out.println("⚠️ Ya existe una firma para la solicitud " + solicitudBase.getId() + ", la eliminaré antes de crear otra.");
-                    firmaCtrl.eliminar(f.getId());
-                }
-            }
-
-            // crear nueva firma
-            Firma f = new Firma();
-            f.setDescripcion("Firma de autorización inicial (testCrearFirma)");
-            f.setSolicitud(solicitudBase);
-
-            firmaCtrl.crear(f);
-
-            assertNotNull("La firma debe tener un ID asignado", f.getId());
-            System.out.println("✅ Firma creada con ID: " + f.getId());
-        } catch (Throwable t) {
-            t.printStackTrace();
-            fail("Se produjo una excepción durante testCrearFirma: " + t.getMessage());
-        }
+        firmaCtrl.crear(f);
+        assertNotNull("La firma debe tener un ID asignado", f.getId());
+        System.out.println("✅ Firma creada con ID: " + f.getId());
     }
 
     @Test
     public void testListarFirmas() {
-        try {
-            List<Firma> lista = firmaCtrl.listarTodos();
-            if (lista.isEmpty()) {
-                // si no hay firmas, crear una mínima
-                testCrearFirma();
-                lista = firmaCtrl.listarTodos();
-            }
-            assertTrue("Debe existir al menos una firma", !lista.isEmpty());
-            System.out.println("📋 Total firmas: " + lista.size());
-        } catch (Throwable t) {
-            t.printStackTrace();
-            fail("Excepción en testListarFirmas: " + t.getMessage());
+        List<Firma> lista = firmaCtrl.listarTodos();
+        if (lista.isEmpty()) {
+            testCrearFirma();
+            lista = firmaCtrl.listarTodos();
         }
+        assertFalse("Debe existir al menos una firma", lista.isEmpty());
+        System.out.println("📋 Total firmas: " + lista.size());
     }
 
     @Test
     public void testActualizarFirma() {
-        try {
-            List<Firma> firmas = firmaCtrl.listarTodos();
-            if (firmas.isEmpty()) {
-                testCrearFirma();
-                firmas = firmaCtrl.listarTodos();
-            }
-
-            Firma f = firmas.get(0);
-            f.setDescripcion("Firma actualizada desde test");
-            Firma actualizada = firmaCtrl.actualizar(f);
-
-            assertEquals("La descripción debe haberse actualizado",
-                         "Firma actualizada desde test", actualizada.getDescripcion());
-            System.out.println("✅ Firma actualizada correctamente");
-        } catch (Throwable t) {
-            t.printStackTrace();
-            fail("Excepción en testActualizarFirma: " + t.getMessage());
+        List<Firma> lista = firmaCtrl.listarTodos();
+        if (lista.isEmpty()) {
+            testCrearFirma();
+            lista = firmaCtrl.listarTodos();
         }
+
+        Firma f = lista.get(0);
+        f.setDescripcion("Firma actualizada " + LocalDateTime.now());
+        Firma actualizada = firmaCtrl.actualizar(f);
+
+        assertEquals(f.getDescripcion(), actualizada.getDescripcion());
+        System.out.println("✅ Firma actualizada: " + actualizada.getDescripcion());
     }
 
     @Test
     public void testEliminarFirma() {
-        try {
-            List<Firma> lista = firmaCtrl.listarTodos();
-            if (lista.isEmpty()) {
-                testCrearFirma();
-                lista = firmaCtrl.listarTodos();
-            }
-
+        List<Firma> lista = firmaCtrl.listarTodos();
+        if (!lista.isEmpty()) {
             Firma f = lista.get(0);
-            Long id = f.getId();
-            firmaCtrl.eliminar(id);
-            Firma eliminado = firmaCtrl.buscarPorId(id);
-
-            assertNull("La firma debería eliminarse correctamente", eliminado);
+            firmaCtrl.eliminar(f.getId());
+            Firma eliminado = firmaCtrl.buscarPorId(f.getId());
+            assertNull("La firma debería eliminarse", eliminado);
             System.out.println("🗑️ Firma eliminada correctamente");
-        } catch (Throwable t) {
-            t.printStackTrace();
-            fail("Excepción en testEliminarFirma: " + t.getMessage());
         }
+    }
+
+    @Test
+    public void testBuscarPorDescripcion() {
+        Firma f = new Firma();
+        f.setDescripcion("Busqueda Desc");
+        f.setSolicitud(solicitudBase);
+        firmaCtrl.crear(f);
+
+        List<Firma> resultado = firmaCtrl.buscarPorDescripcion("Busqueda Desc");
+        assertFalse("Debe encontrar al menos una firma por descripción", resultado.isEmpty());
+        System.out.println("🔍 Firmas encontradas por descripción: " + resultado.size());
+    }
+
+    @Test
+    public void testBuscarPorFecha() {
+        LocalDateTime ahora = LocalDateTime.now();
+        Firma f = new Firma();
+        f.setDescripcion("Busqueda Fecha");
+        f.setSolicitud(solicitudBase);
+        f.setFechaFirma(ahora);
+        firmaCtrl.crear(f);
+
+        List<Firma> resultado = firmaCtrl.buscarPorFecha(ahora.minusMinutes(1), ahora.plusMinutes(1));
+        assertFalse("Debe encontrar al menos una firma por fecha", resultado.isEmpty());
+        System.out.println("🔍 Firmas encontradas por fecha: " + resultado.size());
+    }
+
+    @Test
+    public void testBuscarPorSolicitudYFecha() {
+        LocalDateTime ahora = LocalDateTime.now();
+        Firma f = new Firma();
+        f.setDescripcion("Busqueda SolFecha");
+        f.setSolicitud(solicitudBase);
+        f.setFechaFirma(ahora);
+        firmaCtrl.crear(f);
+
+        List<Firma> resultado = firmaCtrl.buscarPorSolicitudYFecha(
+            solicitudBase.getId(), ahora.minusMinutes(1), ahora.plusMinutes(1)
+        );
+        assertFalse("Debe encontrar al menos una firma por solicitud y fecha", resultado.isEmpty());
+        System.out.println("🔍 Firmas encontradas por solicitud y fecha: " + resultado.size());
     }
 }

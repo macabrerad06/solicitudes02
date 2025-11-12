@@ -17,4 +17,29 @@ public class PermisoAplicacionControladorImpl implements PermisoAplicacionContro
     @Override public List<PermisoAplicacion> listarTodos() { return permisoDao.listarTodos(); }
     @Override public List<PermisoAplicacion> buscarPorAplicacion(Long idAplicacion) { return permisoDao.buscarPorAplicacion(idAplicacion); }
     @Override public List<PermisoAplicacion> buscarPorNombre(String nombre) { return permisoDao.buscarPorNombre(nombre); }
+    @Override
+    public List<PermisoAplicacion> buscarPorDescripcion(String descripcion) {
+        return permisoDao.buscarPorDescripcion(descripcion);
+    }
+
+    @Override
+    public List<PermisoAplicacion> buscarPorNombreODescripcion(String texto) {
+        return permisoDao.buscarPorNombreODescripcion(texto);
+    }
+
+    @Override
+    public List<PermisoAplicacion> buscarPorAplicacionYNombre(Long idAplicacion, String nombre) {
+        return permisoDao.buscarPorAplicacionYNombre(idAplicacion, nombre);
+    }
+
+    @Override
+    public List<PermisoAplicacion> buscarPorAplicacionYDescripcion(Long idAplicacion, String descripcion) {
+        return permisoDao.buscarPorAplicacionYDescripcion(idAplicacion, descripcion);
+    }
+
+    @Override
+    public List<PermisoAplicacion> buscarPorAplicacionNombreYDescripcion(Long idAplicacion, String nombre, String descripcion) {
+        return permisoDao.buscarPorAplicacionNombreYDescripcion(idAplicacion, nombre, descripcion);
+    }
+
 }
