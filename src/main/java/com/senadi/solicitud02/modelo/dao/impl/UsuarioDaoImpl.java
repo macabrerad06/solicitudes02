@@ -139,4 +139,40 @@ public class UsuarioDaoImpl implements UsuarioDao {
         } finally { em.close(); }
     }
 
+    @Override
+    public Usuario autenticar(String correo, String password) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            System.out.println(">>> Intentando autenticar: " + correo + " / " + password);
+
+            // 1) Verificar si encuentra el usuario por correo
+            Usuario porCorreo = em.createQuery(
+                    "SELECT u FROM Usuario u WHERE u.correo = :c", Usuario.class)
+                    .setParameter("c", correo)
+                    .getResultStream()
+                    .findFirst()
+                    .orElse(null);
+
+            if (porCorreo == null) {
+                System.out.println(">>> No se encontró ningún usuario con ese correo");
+                return null;
+            }
+
+            System.out.println(">>> Usuario encontrado: " + porCorreo.getNombre()
+                    + " passBD=" + porCorreo.getPassword());
+
+            // 2) Comparar password (PLANO por ahora)
+            if (porCorreo.getPassword() != null &&
+                porCorreo.getPassword().equals(password)) {
+                return porCorreo;
+            }
+
+            System.out.println(">>> La contraseña no coincide");
+            return null;
+        } finally {
+            em.close();
+        }
+    }
+
+
 }

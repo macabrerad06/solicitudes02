@@ -19,6 +19,9 @@ public class Usuario {
 
     @Column(length = 120, nullable = false, unique = true)
     private String correo;
+    
+    @Column(length = 120, nullable = false, unique = true)
+    private String password;
 
     @Column(length = 80)
     private String cargo;
@@ -98,13 +101,25 @@ public class Usuario {
 	public void setAuditorias(List<Auditoria> auditorias) {
 		this.auditorias = auditorias;
 	}
+	
+	
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
 
 	@Override
 	public String toString() {
-		return "Usuario [id=" + id + ", nombre=" + nombre + ", apellido=" + apellido + ", correo=" + correo + ", cargo="
-				+ cargo + ", solicitudes=" + solicitudes + ", rolesAsignados=" + rolesAsignados + ", auditorias="
-				+ auditorias + "]";
+		return "Usuario [id=" + id + ", nombre=" + nombre + ", apellido=" + apellido + ", correo=" + correo
+				+ ", password=" + password + ", cargo=" + cargo + ", solicitudes=" + solicitudes + ", rolesAsignados="
+				+ rolesAsignados + ", auditorias=" + auditorias + "]";
 	}
+
+	
 
     
 }

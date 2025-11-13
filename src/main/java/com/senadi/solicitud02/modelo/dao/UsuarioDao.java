@@ -17,6 +17,8 @@ public interface UsuarioDao {
     List<Usuario> buscarPorCargo(String cargo);
     List<Usuario> buscarPorNombreYApellido(String nombre, String apellido);
     List<Usuario> buscarPorNombreOCorreo(String texto); // búsqueda parcial
+    
+    Usuario autenticar(String correo, String password);
 
 
 }

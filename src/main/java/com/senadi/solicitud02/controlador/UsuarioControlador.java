@@ -18,5 +18,6 @@ public interface UsuarioControlador {
     List<Usuario> buscarPorNombreYApellido(String nombre, String apellido);
     List<Usuario> buscarPorNombreOCorreo(String texto);
 
+    Usuario autenticar(String correo, String password);
 
 }

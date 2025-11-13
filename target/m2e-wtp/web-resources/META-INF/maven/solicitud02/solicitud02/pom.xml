@@ -1,84 +1,94 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>solicitud02</groupId>
   <artifactId>solicitud02</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>war</packaging>
-  
+
   <dependencies>
-  		<!-- https://mvnrepository.com/artifact/org.eclipse.persistence/javax.persistence -->
-		<dependency>
-	        <groupId>org.eclipse.persistence</groupId>
-	        <artifactId>eclipselink</artifactId>
-        	<version>2.7.12</version>
-    	</dependency>
 
-		
-		<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
-		<dependency>
-		    <groupId>mysql</groupId>
-		    <artifactId>mysql-connector-java</artifactId>
-		    <version>8.0.33</version>
-		</dependency>
-		
-		<dependency>
-	        <groupId>javax.persistence</groupId>
-	        <artifactId>javax.persistence-api</artifactId>
-	        <version>2.2</version>
-	    </dependency>
-    
-    
-	<!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
-		<dependency>
-		    <groupId>javax.servlet</groupId>
-		    <artifactId>javax.servlet-api</artifactId>
-		    <version>4.0.1</version>
-		    <scope>provided</scope>
-		</dependency>
-	
-	
-	<!-- https://mvnrepository.com/artifact/com.sun.faces/jsf-impl -->
-		<dependency>
-		    <groupId>com.sun.faces</groupId>
-		    <artifactId>jsf-impl</artifactId>
-		    <version>2.2.20</version>
-		</dependency>
+    <!-- JPA - Eclipselink -->
+    <dependency>
+      <groupId>org.eclipse.persistence</groupId>
+      <artifactId>eclipselink</artifactId>
+      <version>2.7.12</version>
+    </dependency>
 
+    <!-- MySQL -->
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>8.0.33</version>
+    </dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.sun.faces/jsf-api -->
-		<dependency>
-		    <groupId>com.sun.faces</groupId>
-		    <artifactId>jsf-api</artifactId>
-		    <version>2.2.20</version>
-		</dependency>
+    <!-- API JPA -->
+    <dependency>
+      <groupId>javax.persistence</groupId>
+      <artifactId>javax.persistence-api</artifactId>
+      <version>2.2</version>
+    </dependency>
 
+    <!-- Servlet -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>4.0.1</version>
+      <scope>provided</scope>
+    </dependency>
 
-<!-- PrimeFaces (última línea compatible con javax) -->
-		<dependency>
-		  <groupId>org.primefaces</groupId>
-		  <artifactId>primefaces</artifactId>
-		  <version>11.0.0</version>
-		</dependency>
+    <!-- JSF -->
+    <dependency>
+      <groupId>com.sun.faces</groupId>
+      <artifactId>jsf-impl</artifactId>
+      <version>2.2.20</version>
+    </dependency>
 
-    
-    
+    <dependency>
+      <groupId>com.sun.faces</groupId>
+      <artifactId>jsf-api</artifactId>
+      <version>2.2.20</version>
+    </dependency>
 
-	    <!-- JUnit para tus pruebas -->
-	    <dependency>
-	        <groupId>junit</groupId>
-	        <artifactId>junit</artifactId>
-	        <version>4.13.2</version>
-	        <scope>test</scope>
-	    </dependency>
-	    
-	    
-	    <dependency>
-            <groupId>com.novell.ldap</groupId>
-            <artifactId>jldap</artifactId>
-            <version>2009-10-07</version>
-        </dependency>
-		
+    <!-- ✅ PrimeFaces -->
+    <dependency>
+      <groupId>org.primefaces</groupId>
+      <artifactId>primefaces</artifactId>
+      <version>11.0.0</version>
+    </dependency>
+
+    <!-- ✅ PrimeFaces Extensions (para habilitar <p:layout> y otros componentes avanzados) -->
+    <dependency>
+      <groupId>org.primefaces.extensions</groupId>
+      <artifactId>primefaces-extensions</artifactId>
+      <version>11.0.6</version>
+    </dependency>
+
+    <!-- ✅ PrimeFaces Themes (compatible con PrimeFaces 11) -->
+    <dependency>
+      <groupId>org.primefaces.themes</groupId>
+      <artifactId>all-themes</artifactId>
+      <version>1.0.10</version>
+    </dependency>
+
+    <!-- LDAP -->
+    <dependency>
+      <groupId>com.novell.ldap</groupId>
+      <artifactId>jldap</artifactId>
+      <version>2009-10-07</version>
+    </dependency>
+
+    <!-- JUnit -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
+
   <build>
     <resources>
       <resource>
@@ -100,6 +110,7 @@
         </excludes>
       </resource>
     </resources>
+
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -108,6 +119,7 @@
           <release>21</release>
         </configuration>
       </plugin>
+
       <plugin>
         <artifactId>maven-war-plugin</artifactId>
         <version>3.2.3</version>

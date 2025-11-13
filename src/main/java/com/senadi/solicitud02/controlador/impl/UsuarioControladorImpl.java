@@ -41,5 +41,11 @@ public class UsuarioControladorImpl implements UsuarioControlador {
     public List<Usuario> buscarPorNombreOCorreo(String texto) {
         return usuarioDao.buscarPorNombreOCorreo(texto);
     }
+    
+    @Override
+    public Usuario autenticar(String correo, String password) {
+        return usuarioDao.autenticar(correo, password);
+    }
+
 
 }
