@@ -1,10 +1,70 @@
 <!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-</head>
-<body>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
 
-</body>
+<ui:composition template="/home.xhtml">
+
+    <ui:define name="contenido">
+
+        <h:form id="formRoles">
+
+            <p:messages id="msgs"
+                        showDetail="true"
+                        closable="true"
+                        autoUpdate="true"/>
+
+            <h2>Gestión de Roles</h2>
+
+            <p:commandButton value="Nuevo Rol"
+                             icon="pi pi-plus"
+                             styleClass="ui-button-success"
+                             action="#{rolBean.irCrear}"
+                             ajax="false" />
+
+            <br/><br/>
+
+            <p:dataTable id="tablaRoles"
+                         value="#{rolBean.lista}"
+                         var="r"                         
+                         rowKey="#{r.id}"
+                         paginator="true"
+                         rows="10">
+
+                <p:column headerText="ID" width="60">
+                    #{r.id}
+                </p:column>
+
+                <p:column headerText="Nombre">
+                    #{r.nombre}
+                </p:column>
+
+                <p:column headerText="Descripción">
+                    #{r.descripcion}
+                </p:column>
+
+                <p:column headerText="Acciones" style="width:170px">
+                    <!-- Editar navega a edit.xhtml?id=... -->
+                    <p:commandButton icon="pi pi-pencil"
+                                     title="Editar"
+                                     action="#{rolBean.irEditar(r.id)}"
+                                     ajax="false" />
+
+                    <!-- Eliminar se queda en la misma página -->
+                    <p:commandButton icon="pi pi-trash"
+                                     styleClass="ui-button-danger"
+                                     actionListener="#{rolBean.eliminar(r.id)}"
+                                     update="@form"
+                                     onclick="return confirm('¿Eliminar este rol?');"/>
+                </p:column>
+
+            </p:dataTable>
+
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>
 </html>

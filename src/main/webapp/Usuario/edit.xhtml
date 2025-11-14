@@ -1,10 +1,48 @@
 <!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-</head>
-<body>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
 
-</body>
+<ui:composition template="/home.xhtml">
+
+    <ui:define name="contenido">
+
+        <h2>Editar Usuario</h2>
+
+        <h:form>
+
+            <p:panel header="Datos del Usuario">
+
+                <p:inputText value="#{usuarioBean.formulario.nombre}"
+                             label="Nombre"
+                             required="true" style="width:100%" />
+
+                <p:inputText value="#{usuarioBean.formulario.correo}"
+                             label="Correo"
+                             required="true" style="width:100%" />
+
+                <!-- Password opcional en edición -->
+                <p:password value="#{usuarioBean.formulario.password}"
+                            label="Contraseña (nueva)"
+                            style="width:100%" />
+
+                <br/><br/>
+
+                <p:commandButton value="Actualizar" 
+                                 action="#{usuarioBean.guardar}"
+                                 styleClass="ui-button-success" />
+
+                <p:commandButton value="Cancelar"
+                                 action="#{usuarioBean.cancelar}"
+                                 styleClass="ui-button-secondary"
+                                 immediate="true" />
+
+            </p:panel>
+
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>
 </html>

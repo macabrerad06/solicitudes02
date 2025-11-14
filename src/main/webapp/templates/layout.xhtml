@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<h:head>
+    <title><ui:insert name="titulo">Panel principal</ui:insert></title>
+    <!-- Mismo CSS que ya usas -->
+    <h:outputStylesheet library="css" name="style.css" />
+</h:head>
+
+<h:body>
+
+    <div class="dashboard">
+        <!-- ===== SIDEBAR FIJO ===== -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h:graphicImage library="img" name="logo.png"
+                                styleClass="sidebar-logo"
+                                alt="Logo" />
+                <h3>Sistema de Solicitudes</h3>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul id="menu">
+
+                    <!-- Ítem visible para todos -->
+                    <li>
+                    	<h:outputLink value="#{request.contextPath}/home.xhtml">
+						        Inicio
+						    </h:outputLink>
+                    </li>
+
+                    <!-- ANALISTA -->
+                    <h:panelGroup rendered="#{loginBean.usuario.cargo eq 'Analista'}">
+                        <li><a href="#">Solicitudes pendientes</a></li>
+                        <li><a href="#">Revisión de documentos</a></li>
+                    </h:panelGroup>
+
+                    <!-- ADMINISTRADOR -->
+                    <h:panelGroup rendered="#{loginBean.usuario.cargo eq 'Administrador'}">
+                        <li><a href="#">Gestión de Usuarios</a></li>
+                        <li>
+						    <h:outputLink value="#{request.contextPath}/Rol/index.xhtml">
+						        Asignación de Roles
+						    </h:outputLink>
+						</li>
+                        
+                        <li><a href="#">Auditoría del Sistema</a></li>
+                    </h:panelGroup>
+
+                    <!-- DIRECTOR -->
+                    <h:panelGroup rendered="#{loginBean.usuario.cargo eq 'Director'}">
+                        <li><a href="#">Reportes</a></li>
+                        <li><a href="#">Indicadores Generales</a></li>
+                    </h:panelGroup>
+
+                    <!-- Ítem visible para todos -->
+                    <li><a href="#">Mi Perfil</a></li>
+                </ul>
+            </nav>
+
+            <!-- Botón logout -->
+            <h:form id="logoutForm">
+                <h:commandButton id="logoutBtn"
+                                 value="Cerrar Sesión"
+                                 action="#{loginBean.logout}"
+                                 styleClass="btn-logout"
+                                 ajax="false" />
+            </h:form>
+        </aside>
+
+        <!-- ===== CONTENIDO VARIABLE ===== -->
+        <main class="main-content">
+
+            <!-- Cabecera con datos del usuario (fija en el layout) -->
+            <header class="main-header">
+                <h2>
+                    Bienvenido,
+                    #{loginBean.usuario.nombre}
+                    #{loginBean.usuario.apellido}
+                </h2>
+                <p>
+                    Correo: #{loginBean.usuario.correo}
+                    Cargo: #{loginBean.usuario.cargo}
+                </p>
+            </header>
+
+            <!-- Aquí se inyecta el contenido de cada página -->
+            <section class="content">
+                <ui:insert name="contenido">
+                    <!-- Contenido por defecto (si no definen 'contenido') -->
+                    <div class="card">
+                        <h3>Resumen General</h3>
+                        <p>El contenido se ajustará según el rol del usuario.</p>
+                    </div>
+                </ui:insert>
+            </section>
+
+        </main>
+    </div>
+
+</h:body>
+</html>

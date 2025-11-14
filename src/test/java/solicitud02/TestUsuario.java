@@ -7,7 +7,6 @@ import com.senadi.solicitud02.controlador.UsuarioControlador;
 import com.senadi.solicitud02.controlador.impl.UsuarioControladorImpl;
 import com.senadi.solicitud02.modelo.entidades.Usuario;
 
-import java.util.List;
 
 public class TestUsuario {
 
